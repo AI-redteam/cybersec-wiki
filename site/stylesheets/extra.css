@@ -1,0 +1,16 @@
+/* Custom styling for cybersecurity wiki */
+.md-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.md-typeset h1 {
+    color: var(--md-primary-fg-color);
+    border-bottom: 2px solid var(--md-primary-fg-color);
+    padding-bottom: 0.5rem;
+}
+
+.md-typeset code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.15rem 0.3rem;
+    border-radius: 0.2rem;
+}
