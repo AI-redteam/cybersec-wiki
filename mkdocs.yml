@@ -1,1 +1,154 @@
-site_name: My Docs
+site_name: Cybersecurity Research Lab
+site_description: Advanced cybersecurity research, AI security, and threat intelligence
+site_url: https://yourusername.github.io/cybersec-wiki/
+
+repo_name: cybersec-wiki
+repo_url: https://github.com/yourusername/cybersec-wiki
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: red
+      accent: red
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: red
+      accent: red
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+    - toc.integrate
+
+nav:
+  - Home: index.md
+  - AI Security:
+    - ai-security/index.md
+    - LLM Security:
+      - Prompt Injection: ai-security/llm/prompt-injection.md
+    - Machine Learning:
+      - Adversarial Examples: ai-security/ml/adversarial-examples.md
+    - Red Team Playbooks: ai-security/playbooks.md
+  - Cloud Security:
+    - cloud-security/index.md
+    - AWS:
+      - IAM Exploitation: cloud-security/aws/iam-exploitation.md
+    - Azure:
+      - Azure AD Security: cloud-security/azure/azure-ad.md
+    - GCP:
+      - IAM Exploitation: cloud-security/gcp/iam-exploitation.md
+  - TTPs:
+    - ttps/index.md
+    - Red Team:
+      - Initial Access: ttps/redteam/initial-access.md
+      - Privilege Escalation: ttps/redteam/privilege-escalation.md
+      - Persistence: ttps/redteam/persistence.md
+  - Vulnerability Research:
+    - research/index.md
+    - Vulnerabilities:
+      - CVE Analysis: research/vulns/cves.md
+      - Zero-Day Research: research/vulns/zero-days.md
+    - Research Papers: research/papers.md
+  - Security Tools:
+    - tools/index.md
+    - Offensive:
+      - Reconnaissance: tools/offensive/recon.md
+    - Defensive:
+      - Detection: tools/defensive/detection.md
+    - Lab Setup: tools/lab-setup.md
+  - Training:
+    - training/index.md
+  - About:
+    - about/index.md
+
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - mermaid2:
+      arguments:
+        theme: dark
+        themeVariables:
+          primaryColor: '#ff0000'
+  - git-revision-date-localized:
+      type: datetime
+      enable_creation_date: true
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/yourusername/cybersec-wiki
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/yourusername
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+copyright: Copyright &copy; 2025 Cybersecurity Research Lab
