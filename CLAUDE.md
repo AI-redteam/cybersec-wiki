@@ -39,7 +39,7 @@ mkdocs serve --dev-addr=127.0.0.1:8000
   - `research/` - Vulnerability research and findings
   - `tools/` - Security tools and methodologies
   - `includes/abbreviations.md` - Common cybersecurity acronym definitions
-- `mkdocs.yml` - MkDocs configuration (currently minimal)
+- `mkdocs.yml` - MkDocs configuration with Material theme, navigation, and plugins
 - `requirements.txt` - Python dependencies for MkDocs and plugins
 - `.github/workflows/deploy.yml` - Automated deployment to GitHub Pages
 - `overrides/` - Custom theme overrides
@@ -60,3 +60,26 @@ The site automatically deploys to GitHub Pages on pushes to the main branch via 
 - Each major section has an index.md file
 - Focus on cybersecurity research, defensive techniques, and educational content
 - Organize content by security domain (AI, cloud, tools, etc.)
+
+## Advanced Features
+
+The site includes:
+- **Mermaid diagram support** for attack flows and architectures
+- **Code syntax highlighting** with copy functionality
+- **Advanced search** with intelligent separators
+- **Dark/light theme toggle** for accessibility
+- **Navigation tabs** with sticky sections
+- **Git revision tracking** for content versioning
+- **Content minification** for performance
+
+## Content Status
+
+### Completed Sections
+- **AI Security**: Comprehensive coverage including LLM security (prompt injection), adversarial ML, and red team playbooks
+- **Navigation & Theme**: Full MkDocs Material configuration with professional styling
+
+### Pending Sections
+- Cloud Security (AWS, Azure, GCP)
+- TTPs (Red Team techniques)
+- Vulnerability Research
+- Security Tools

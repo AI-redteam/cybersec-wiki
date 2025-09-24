@@ -1,105 +1,469 @@
-# Adversarial Machine Learning: Attacks and Defenses
+# Adversarial Machine Learning: Testing and Defense Tools
 
-## Overview
+Practical tools and techniques for testing ML model robustness, detecting adversarial attacks, and implementing defenses against adversarial examples in production systems.
 
-Adversarial machine learning represents a critical security domain where attackers exploit vulnerabilities in ML models through carefully crafted inputs designed to cause misclassification, extract sensitive information, or compromise model integrity. These attacks pose significant risks to AI-dependent systems across industries.
+## Adversarial Testing Frameworks
 
-## Attack Taxonomy
+### Adversarial Robustness Toolbox (ART)
 
-### Evasion Attacks
+```bash
+# Install IBM's Adversarial Robustness Toolbox
+pip install adversarial-robustness-toolbox
 
-Evasion attacks occur at inference time, where adversarial examples are crafted to fool deployed models.
-
-#### Image Classification Attacks
-
-**Fast Gradient Sign Method (FGSM)**
-```python
+# Basic adversarial attack testing
+python -c "
+from art.attacks.evasion import FastGradientMethod
+from art.estimators.classification import PyTorchClassifier
 import torch
-import torch.nn.functional as F
 
-def fgsm_attack(image, epsilon, data_grad):
-    """Generate adversarial example using FGSM"""
-    # Collect the element-wise sign of the data gradient
-    sign_data_grad = data_grad.sign()
-    # Create the perturbed image by adjusting each pixel
-    perturbed_image = image + epsilon * sign_data_grad
-    # Clip to maintain [0,1] range
-    perturbed_image = torch.clamp(perturbed_image, 0, 1)
-    return perturbed_image
+# Create ART classifier wrapper
+model = torch.load('model.pth')
+classifier = PyTorchClassifier(model=model, loss=torch.nn.CrossEntropyLoss(),
+                              input_shape=(3, 224, 224), nb_classes=10)
 
-# Usage example
-def generate_adversarial_example(model, image, target, epsilon=0.25):
-    image.requires_grad = True
-    output = model(image)
-    loss = F.nll_loss(output, target)
-    model.zero_grad()
-    loss.backward()
-    data_grad = image.grad.data
-    perturbed_image = fgsm_attack(image, epsilon, data_grad)
-    return perturbed_image
+# FGSM attack
+attack = FastGradientMethod(estimator=classifier, eps=0.1)
+x_test_adv = attack.generate(x=x_test)
+"
+
+# Robustness evaluation
+python art_evaluate.py --model resnet50.pth --attack fgsm --epsilon 0.1 --dataset cifar10
+
+# Generate adversarial examples for testing
+python art_generate.py --attack pgd --model model.pth --output adversarial_samples.npy
+
+# Defense evaluation
+python art_defend.py --defense adversarial_training --model model.pth --test-set test_data.npy
 ```
 
-**Projected Gradient Descent (PGD)**
-```python
-def pgd_attack(model, images, labels, eps=0.3, alpha=2/255, iters=10):
-    """Multi-step adversarial attack using PGD"""
-    images = images.clone().detach().to(device)
-    labels = labels.clone().detach().to(device)
+### Foolbox - Model Robustness Testing
 
-    # Random start
-    delta = torch.zeros_like(images).uniform_(-eps, eps)
-    delta = torch.clamp(images + delta, 0, 1) - images
+```bash
+# Install Foolbox
+pip install foolbox
 
-    for i in range(iters):
-        delta.requires_grad = True
-        output = model(images + delta)
-        loss = F.cross_entropy(output, labels)
-        loss.backward()
+# Test model robustness
+python -c "
+import foolbox as fb
+import torch
 
-        grad = delta.grad.detach()
-        delta = delta + alpha * grad.sign()
-        delta = torch.clamp(delta, -eps, eps)
-        delta = torch.clamp(images + delta, 0, 1) - images
+model = torch.load('model.pth')
+fmodel = fb.PyTorchModel(model, bounds=(0, 1))
 
-    return images + delta
+# L-infinity PGD attack
+attack = fb.attacks.LinfPGD()
+epsilons = [0.0, 0.001, 0.01, 0.03, 0.1, 0.3, 0.5, 1.0]
+_, advs, success = attack(fmodel, images, labels, epsilons=epsilons)
+"
+
+# Batch robustness testing
+foolbox-test --model model.pth --dataset cifar10 --attacks fgsm,pgd,cw --output results.json
+
+# Model comparison
+foolbox-compare --models model1.pth,model2.pth --attacks all --output comparison.html
 ```
 
-#### Real-World Evasion Examples
+### CleverHans Security Testing
 
-**Autonomous Vehicle Attacks**
-- **Stop Sign Manipulation**: Adding stickers to stop signs to cause misclassification
-- **Lane Detection Bypass**: Road marking modifications to confuse lane detection
-- **Object Detection Evasion**: Adversarial patches to hide pedestrians from detection
+```bash
+# Install CleverHans
+pip install cleverhans
 
-**Facial Recognition Bypass**
-```python
-# Adversarial glasses attack
-def generate_adversarial_glasses(model, face_image, target_identity):
-    """Generate adversarial eyewear pattern"""
-    glasses_mask = create_glasses_mask(face_image.shape)
+# Adversarial training
+python cleverhans_train.py --model resnet --dataset cifar10 --attack pgd --epochs 10
 
-    # Optimize only the glasses region
-    adversarial_pattern = torch.zeros_like(glasses_mask)
-    adversarial_pattern.requires_grad = True
+# Security evaluation
+python cleverhans_eval.py --model model.pth --attack-config attacks.yaml
 
-    optimizer = torch.optim.Adam([adversarial_pattern], lr=0.01)
-
-    for epoch in range(1000):
-        masked_image = face_image.clone()
-        masked_image[glasses_mask] = adversarial_pattern[glasses_mask]
-
-        output = model(masked_image)
-        loss = F.cross_entropy(output, target_identity)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        # Clip to valid pixel range
-        adversarial_pattern.data = torch.clamp(adversarial_pattern.data, 0, 1)
-
-    return adversarial_pattern
+# Generate test cases
+python cleverhans_generate.py --attack fgsm --epsilon 0.1 --output test_cases/
 ```
+
+## Model Robustness Assessment
+
+### AutoAttack - Comprehensive Evaluation
+
+```bash
+# Install AutoAttack
+pip install autoattack
+
+# Comprehensive robustness evaluation
+python -c "
+from autoattack import AutoAttack
+import torch
+
+model = torch.load('model.pth')
+adversary = AutoAttack(model, norm='Linf', eps=8/255, version='standard')
+
+# Run all attacks
+x_adv = adversary.run_standard_evaluation(x_test, y_test, bs=250)
+"
+
+# Adaptive attack evaluation
+python autoattack_eval.py --model model.pth --dataset cifar10 --threat-model Linf --epsilon 0.031
+
+# Custom attack configuration
+python autoattack_custom.py --config custom_attacks.yaml --model model.pth
+```
+
+### RobustBench - Standardized Evaluation
+
+```bash
+# Install RobustBench
+pip install git+https://github.com/RobustBench/robustbench.git
+
+# Evaluate against standard benchmarks
+python -c "
+from robustbench import benchmark
+from robustbench.utils import load_model
+
+model = load_model('Standard_R50', dataset='cifar10', threat_model='Linf')
+clean_acc, robust_acc = benchmark(model, dataset='cifar10', threat_model='Linf')
+print(f'Clean accuracy: {clean_acc:.2%}')
+print(f'Robust accuracy: {robust_acc:.2%}')
+"
+
+# Model leaderboard comparison
+robustbench-eval --model-name Custom_Model --dataset cifar10 --threat-model Linf --eps 0.031
+
+# Submit results to leaderboard
+robustbench-submit --model model.pth --results results.json --dataset cifar10
+```
+
+## Real-Time Defense Systems
+
+### Adversarial Example Detection
+
+```bash
+# Deploy adversarial detection service
+docker run -d --name adv-detector \
+  -p 8080:8080 \
+  -v /models:/app/models \
+  adversarial-detector:latest
+
+# Configure detection thresholds
+curl -X POST http://localhost:8080/config \
+  -H "Content-Type: application/json" \
+  -d '{
+    "detection_threshold": 0.7,
+    "statistical_tests": ["gradcam", "local_outlier", "mahalanobis"],
+    "preprocessing": ["jpeg_compression", "gaussian_blur"]
+  }'
+
+# Real-time detection API
+curl -X POST http://localhost:8080/detect \
+  -H "Content-Type: application/json" \
+  -F "image=@suspicious_image.jpg"
+
+# Batch processing
+curl -X POST http://localhost:8080/batch_detect \
+  -F "images=@image_batch.zip" \
+  -F "config=@detection_config.json"
+```
+
+### Input Preprocessing Pipeline
+
+```bash
+# Install preprocessing tools
+pip install torchvision pillow opencv-python
+
+# JPEG compression defense
+python preprocess_defense.py --method jpeg_compression --quality 75 --input images/ --output processed/
+
+# Gaussian noise injection
+python preprocess_defense.py --method gaussian_noise --std 0.1 --input images/ --output processed/
+
+# Quantization defense
+python preprocess_defense.py --method quantization --bits 4 --input images/ --output processed/
+
+# Feature squeezing
+python preprocess_defense.py --method feature_squeezing --depth_reduction 4 --spatial_smoothing 2
+```
+
+## Model Training and Hardening
+
+### Adversarial Training Implementation
+
+```bash
+# Install adversarial training tools
+pip install torch torchvision advertorch
+
+# Standard adversarial training
+python adversarial_train.py \
+  --model resnet18 \
+  --dataset cifar10 \
+  --attack pgd \
+  --epsilon 0.031 \
+  --alpha 0.007 \
+  --steps 10 \
+  --epochs 100
+
+# TRADES training (TRadeoff-inspired Adversarial DEfense)
+python trades_train.py \
+  --model wide_resnet \
+  --dataset cifar10 \
+  --lambda 6.0 \
+  --epsilon 0.031 \
+  --step-size 0.007
+
+# MART training (Misclassification Aware adveRsarial Training)
+python mart_train.py \
+  --model resnet50 \
+  --dataset imagenet \
+  --beta 5.0 \
+  --epsilon 4/255
+```
+
+### Certified Defense Training
+
+```bash
+# Install certified defense tools
+pip install auto_LiRPA
+
+# IBP (Interval Bound Propagation) training
+python ibp_train.py \
+  --model small_cnn \
+  --dataset mnist \
+  --epsilon 0.1 \
+  --schedule linear \
+  --epochs 100
+
+# CROWN-IBP training
+python crown_ibp_train.py \
+  --model cnn_7layer \
+  --dataset cifar10 \
+  --epsilon 2/255 \
+  --beta-start 0.0 \
+  --beta-end 1.0
+
+# Verification of trained models
+python verify_robustness.py \
+  --model certified_model.pth \
+  --dataset test_set \
+  --epsilon 0.1 \
+  --timeout 300
+```
+
+## Adversarial Attack Tools
+
+### Attack Generation and Testing
+
+```bash
+# Generate FGSM attacks
+python generate_attacks.py --method fgsm --epsilon 0.1 --model model.pth --data test_images/
+
+# PGD attacks with multiple restarts
+python generate_attacks.py --method pgd --epsilon 0.031 --alpha 0.007 --steps 20 --restarts 10
+
+# C&W attacks for evasion
+python generate_attacks.py --method cw --confidence 0 --learning_rate 0.01 --max_iterations 1000
+
+# Universal adversarial perturbations
+python generate_uap.py --dataset cifar10 --model model.pth --delta 0.2 --max_iter 10
+
+# Physical world attack patches
+python generate_patch.py --target_class 1 --patch_size 50 --transformations rotation,brightness,contrast
+```
+
+### Model Extraction Tools
+
+```bash
+# Model extraction via query-based attacks
+python model_extraction.py \
+  --target_api https://api.service.com/predict \
+  --queries 10000 \
+  --architecture resnet18 \
+  --output extracted_model.pth
+
+# Membership inference attacks
+python membership_inference.py \
+  --target_model model.pth \
+  --shadow_models shadow_models/ \
+  --attack_model logistic \
+  --output mia_results.json
+
+# Property inference attacks
+python property_inference.py \
+  --model model.pth \
+  --property age_group \
+  --queries 5000 \
+  --output property_results.json
+```
+
+## Defense Deployment and Monitoring
+
+### Production Defense Systems
+
+```bash
+# Deploy ML model with built-in defenses
+docker run -d --name ml-service-defended \
+  -p 8080:8080 \
+  -e ENABLE_ADVERSARIAL_DETECTION=true \
+  -e PREPROCESSING_PIPELINE=jpeg,blur,quantize \
+  -e DETECTION_THRESHOLD=0.8 \
+  ml-service:defended
+
+# Configure ensemble defense
+kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-ensemble-defense
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ml-defense
+  template:
+    spec:
+      containers:
+      - name: detector
+        image: adversarial-detector:latest
+        ports:
+        - containerPort: 8080
+      - name: preprocessor
+        image: input-preprocessor:latest
+        ports:
+        - containerPort: 8081
+      - name: model-server
+        image: model-server:robust
+        ports:
+        - containerPort: 8082
+EOF
+
+# Monitor adversarial attacks
+prometheus-query 'rate(adversarial_attacks_detected_total[5m])' --output metrics.txt
+```
+
+### Continuous Robustness Testing
+
+```bash
+# Set up automated robustness testing
+cat > robustness_test.sh << 'EOF'
+#!/bin/bash
+# Continuous robustness evaluation
+
+MODEL_PATH=$1
+TEST_DATA=$2
+RESULTS_DIR="robustness_results_$(date +%Y%m%d)"
+
+mkdir -p $RESULTS_DIR
+
+# Run multiple attack evaluations
+python autoattack_eval.py --model $MODEL_PATH --dataset $TEST_DATA --output $RESULTS_DIR/autoattack.json
+python art_evaluate.py --model $MODEL_PATH --attacks fgsm,pgd,cw --output $RESULTS_DIR/art_results.json
+python foolbox_eval.py --model $MODEL_PATH --epsilons 0.001,0.01,0.1 --output $RESULTS_DIR/foolbox.json
+
+# Generate robustness report
+python generate_report.py --results_dir $RESULTS_DIR --output $RESULTS_DIR/robustness_report.html
+
+# Alert if robustness drops below threshold
+python check_robustness_threshold.py --results $RESULTS_DIR --threshold 0.7 --alert_webhook https://alerts.company.com
+EOF
+
+chmod +x robustness_test.sh
+
+# Schedule regular testing
+echo "0 2 * * * /usr/local/bin/robustness_test.sh /models/production_model.pth /data/test_set" | crontab -
+```
+
+## Commercial Security Platforms
+
+### Microsoft Counterfit
+
+```bash
+# Install Counterfit
+pip install counterfit
+
+# Initialize Counterfit environment
+counterfit init --target-path /models/target_model.py
+
+# Run automated security assessment
+counterfit assess --framework pytorch --model resnet50 --attacks all
+
+# Generate security report
+counterfit report --output security_assessment.pdf --format pdf
+
+# Integration with Azure ML
+counterfit azure-ml --workspace security-workspace --experiment adversarial-test
+```
+
+### AWS SageMaker Model Monitor
+
+```bash
+# Configure model monitoring for adversarial inputs
+aws sagemaker create-monitoring-schedule \
+  --monitoring-schedule-name adversarial-monitor \
+  --monitoring-schedule-config file://monitoring-config.json
+
+# Data quality baseline with adversarial detection
+aws sagemaker create-data-quality-job-definition \
+  --job-definition-name adversarial-quality-check \
+  --data-quality-app-specification file://quality-spec.json
+
+# Model bias monitoring
+aws sagemaker create-model-bias-job-definition \
+  --job-definition-name bias-detection \
+  --model-bias-app-specification file://bias-spec.json
+```
+
+### Google Cloud AI Platform Security
+
+```bash
+# Enable adversarial input detection
+gcloud ai-platform models create secure-model \
+  --region us-central1 \
+  --enable-adversarial-detection \
+  --detection-threshold 0.8
+
+# Configure input validation
+gcloud ai-platform versions create v1 \
+  --model secure-model \
+  --origin gs://models/robust-model/ \
+  --python-version 3.8 \
+  --framework tensorflow \
+  --preprocessing-function preprocess_inputs
+
+# Monitor model security metrics
+gcloud logging read "resource.type=ml_job" \
+  --filter 'jsonPayload.adversarial_detected=true' \
+  --format json
+```
+
+## Compliance and Regulatory Tools
+
+### NIST AI Risk Management
+
+```bash
+# AI robustness assessment tool
+python ai_risk_assessment.py \
+  --framework NIST-AI-RMF \
+  --model model.pth \
+  --test-suite comprehensive \
+  --output nist_compliance_report.pdf
+
+# Continuous compliance monitoring
+./compliance_monitor.sh --standard NIST-AI-RMF --check-interval daily
+```
+
+### EU AI Act Compliance
+
+```bash
+# High-risk AI system assessment
+python eu_ai_act_compliance.py \
+  --model model.pth \
+  --category high-risk \
+  --domain computer_vision \
+  --output eu_compliance_report.html
+
+# Document security measures
+python security_documentation.py \
+  --model model.pth \
+  --tests robustness_results/ \
+  --output security_documentation.pdf
+```
+
+This practical approach focuses on actionable tools and commands that security teams can immediately deploy to assess, defend against, and monitor adversarial attacks on ML systems in production environments.
 
 ### Poisoning Attacks
 
