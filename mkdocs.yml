@@ -55,6 +55,7 @@ nav:
     - AWS:
       - IAM Exploitation: cloud-security/aws/iam-exploitation.md
       - MWAA Post-Exploitation: cloud-security/aws/mwaa-post-exploitation.md
+      - SageMaker Presigned URLs: cloud-security/aws/Sagemaker-presigned-urls-blog.md
     - Azure:
       - Azure AD Security: cloud-security/azure/azure-ad.md
     - GCP:
