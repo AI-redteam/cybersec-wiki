@@ -1,3 +1,19 @@
+---
+date: 2025-12-04
+authors:
+  - been
+categories:
+  - Cloud Security
+  - AWS
+tags:
+  - aws
+  - sagemaker
+  - presigned-urls
+  - pentesting
+  - red-team
+description: Deep dive into SageMaker presigned URLs as a powerful pivot point - understanding how these bearer tokens bypass MFA, IDP, and traditional authentication controls, plus hardening strategies using network-based IAM conditions
+---
+
 # **The Golden Ticket: Why SageMaker Presigned URLs are Your New Favorite Pivot Point**
 
 Let’s be real: usually, when we talk about cloud security, we’re talking about S3 buckets left open to the world or over-permissive IAM roles attached to EC2 instances. But while everyone is watching the front door, the Data Science team is building a massive side entrance with Amazon SageMaker.
