@@ -1,9 +1,9 @@
 site_name: Been's Cloud & AI/ML Dojo
 site_description: Advanced cybersecurity research, AI security, and threat intelligence
-site_url: https://yourusername.github.io/cybersec-wiki/
+site_url: https://AI-redteam.github.io/cybersec-wiki/
 
-repo_name: cybersec-wiki
-repo_url: https://github.com/yourusername/cybersec-wiki
+repo_name: AI-redteam/cybersec-wiki
+repo_url: https://github.com/AI-redteam/cybersec-wiki
 edit_uri: edit/main/docs/
 
 theme:
@@ -152,7 +152,7 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/yourusername/cybersec-wiki
+      link: https://github.com/AI-redteam/cybersec-wiki
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/yourusername
   analytics:
