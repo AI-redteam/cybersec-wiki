@@ -190,14 +190,14 @@ When a client asks for a pentest, steer them toward a **Threat Model-First** app
 
 Before running a single script, map the system using industry frameworks.
 
-* **STRIDE-LM:** An extension of Microsoft's STRIDE tailored for Machine Learning.  
-  * **S**poofing: Impersonating a biometric sensor.  
-  * **T**ampering: Poisoning the training data pipeline.  
-  * **R**epudiation: Denying actions taken by an AI agent.  
-  * **I**nformation Disclosure: Model Inversion (extracting private data).  
-  * **D**enial of Service: Sponge attacks (high-latency inputs).  
-  * **E**levation of Privilege: Prompt injection to gain admin rights.  
-* **MITRE ATLAS:** The "ATT\&CK" framework for AI. Use this to map specific threats to real-world tactics.
+* **STRIDE with ATLAS/MAESTRO context:** Apply Microsoft's STRIDE framework with AI-specific threat scenarios mapped to MITRE ATLAS tactics.
+  * **S**poofing: Impersonating a biometric sensor.
+  * **T**ampering: Poisoning the training data pipeline.
+  * **R**epudiation: Denying actions taken by an AI agent.
+  * **I**nformation Disclosure: Model Inversion (extracting private data).
+  * **D**enial of Service: Sponge attacks (high-latency inputs).
+  * **E**levation of Privilege: Prompt injection to gain admin rights.
+* **MITRE ATLAS:** The "ATT&CK" framework for AI. Use this to map specific threats to real-world tactics.
 
 ### **Phase 2: Adversarial Testing as Evidence (POC)**
 
