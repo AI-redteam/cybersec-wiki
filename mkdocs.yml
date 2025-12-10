@@ -48,7 +48,7 @@ nav:
     - LLM Security:
       - Prompt Injection: ai-security/llm/prompt-injection.md
     - Machine Learning:
-      - Adversarial Examples: ai-security/ml/adversarial-examples.md
+      - ML Testing Guide: ai-security/ml/ML-Testing-Guide.md
     - Red Team Playbooks: ai-security/playbooks.md
   - Cloud Security:
     - cloud-security/index.md
