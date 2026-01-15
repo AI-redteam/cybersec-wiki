@@ -24,7 +24,7 @@ When security teams design controlled access to AWS, they often rely on a simple
 
 ## Introducing clier
 
-[clier](https://github.com/your-repo/clier) is a browser extension that extracts AWS STS credentials directly from the AWS Console session. It's the reverse of [consoler](https://github.com/aws-samples/consoler)—while consoler takes CLI credentials and provides console access, clier takes console access and provides CLI credentials.
+[clier](https://github.com/AI-redteam/clier) is a browser extension that extracts AWS STS credentials directly from the AWS Console session. It's the reverse of [consoler](https://github.com/NetSPI/aws_consoler)—while consoler takes CLI credentials and provides console access, clier takes console access and provides CLI credentials.
 
 The tool works by intercepting the `/console/tb/creds` API endpoint that AWS Console uses internally to fetch temporary credentials for making API calls. These credentials exist only in browser memory (not localStorage or cookies), but they're trivially accessible to any code running in the page context.
 
