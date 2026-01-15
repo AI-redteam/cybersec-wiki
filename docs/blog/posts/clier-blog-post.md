@@ -125,4 +125,4 @@ And maybe give clier a try on your own systems. Better you find out than someone
 
 ---
 
-*clier is available at [github.com/your-repo/clier](https://github.com/your-repo/clier). Use responsibly and only on systems you're authorized to test.*
+*clier is available at [github.com/your-repo/clier](https://github.com/AI-redteam/clier). Use responsibly and only on systems you're authorized to test.*
