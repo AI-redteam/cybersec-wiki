@@ -50,6 +50,9 @@ nav:
     - Machine Learning:
       - ML Testing Guide: ai-security/ml/ML-Testing-Guide.md
     - Red Team Playbooks: ai-security/playbooks.md
+  - Cloud Top 10:
+    - cloud-top-10/index.md
+    - "The 2026 AWS Cloud Native Top 10": "cloud-top-10/The 2026 AWS Cloud Native Top 10.md"
   - Cloud Security:
     - cloud-security/index.md
     - AWS:
