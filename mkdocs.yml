@@ -63,6 +63,7 @@ nav:
       - Azure AD Security: cloud-security/azure/azure-ad.md
     - GCP:
       - IAM Exploitation: cloud-security/gcp/iam-exploitation.md
+      - Cloud Workstations Container Breakout: cloud-security/gcp/gcp-cloud-workstations-container-breakout.md
   - TTPs:
     - ttps/index.md
     - Red Team:
