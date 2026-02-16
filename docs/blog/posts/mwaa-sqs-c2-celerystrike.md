@@ -73,6 +73,22 @@ This creates a bidirectional communication channel. An attacker creates two queu
 
 This is the mandatory configuration. Restricting the account ID wildcard or removing SQS actions will cause the MWAA scheduler to fail — workers will never receive tasks, and all DAG executions will hang indefinitely. Defenders have no IAM-based mitigation that doesn't break the service.
 
+### AWS Knows About This
+
+To their credit, AWS acknowledges this in the [execution role documentation](https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html). Here's the note, verbatim:
+
+> *If you have elected for Amazon MWAA to use an AWS owned KMS key to encrypt your data, then you must define permissions in a policy attached to your Amazon MWAA execution role that grant access to arbitrary KMS keys stored outside of your account through Amazon SQS. The following two conditions are required in order for your environment's execution role to access arbitrary KMS keys:*
+>
+> *A KMS key in a third-party account needs to allow this cross account access through its resource policy.*
+>
+> *Your DAG code needs to access an Amazon SQS queue that starts with `airflow-celery-` in the third-party account and uses the same KMS key for encryption.*
+>
+> ***To mitigate the risks associated with cross-account access to resources, we recommend reviewing the code placed in your DAGs** to ensure that your workflows are not accessing arbitrary Amazon SQS queues outside your account.*
+
+Read that last line again. AWS's mitigation for a mandatory cross-account SQS policy is: *review your DAG code*. They're putting the burden entirely on the customer to ensure nobody uploads a malicious DAG — while providing no built-in mechanism to enforce it. No DAG approval workflow, no code signing, no runtime sandboxing. Just "review the code."
+
+They also suggest using a customer-managed KMS key instead of the AWS-owned key, which limits the KMS cross-account surface. But that doesn't change the SQS policy — the `arn:aws:sqs:*:*:airflow-celery-*` wildcard is still there regardless of your encryption choice. And once you've created the environment, you can't change the encryption option.
+
 ---
 
 ## Attack Flow
