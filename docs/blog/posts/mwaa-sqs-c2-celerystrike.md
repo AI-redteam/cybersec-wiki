@@ -25,6 +25,9 @@ AWS Managed Workflows for Apache Airflow (MWAA) ships with a **mandatory** IAM p
 
 We built [CeleryStrike](https://github.com/AI-redteam/celerystrike), a tool that exploits this policy to establish a full command-and-control channel over Airflow workers. A single DAG upload gives an attacker an interactive implant with credential harvesting, cross-account recon, event injection, and arbitrary command execution — all tunneled through SQS queues that are indistinguishable from legitimate Celery traffic.
 
+<img width="799" height="607" alt="image" src="https://github.com/user-attachments/assets/787fc41a-003e-4243-b3a9-92bdc086e492" />
+
+
 This post walks through a live engagement against a real MWAA environment, from initial deployment to full credential harvest.
 
 <!-- more -->
